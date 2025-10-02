@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>منصة الكابتن القانوني - النموذج الأولي</title>
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #f4f7f9; color: #333; line-height: 1.6; margin: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .step { margin-bottom: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        input[type="text"], input[type="email"], input[type="password"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #3498db; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #2980b9; }
+        #results { background-color: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; white-space: pre-wrap; text-align: left; direction: ltr; }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tajawal">
+</head>
+<body>
+    <div class="container">
+        <h1>منصة الكابتن القانوني - النموذج الأولي الهندسي</h1>
+
+        <div class="step">
+            <h2>الخطوة 1: إنشاء مستخدم جديد</h2>
+            <input type="text" id="fullName" placeholder="الاسم الكامل">
+            <input type="email" id="email" placeholder="البريد الإلكتروني">
+            <input type="password" id="password" placeholder="كلمة المرور">
+            <button onclick="createUser( )">إنشاء مستخدم</button>
+        </div>
+
+        <div class="step">
+            <h2>الخطوة 2: إنشاء قضية جديدة</h2>
+            <input type="text" id="userId" placeholder="ID المستخدم">
+            <input type="text" id="caseTitle" placeholder="عنوان القضية">
+            <input type="text" id="caseDescription" placeholder="وصف القضية">
+            <button onclick="createCase()">إنشاء قضية</button>
+        </div>
+
+        <div class="step">
+            <h2>الخطوة 3: تشغيل المحرك الهندسي</h2>
+            <input type="text" id="caseIdForReport" placeholder="ID القضية">
+            <button onclick="getReport()">اطلب التقرير الهندسي</button>
+        </div>
+
+        <h2>النتائج</h2>
+        <pre id="results">سيتم عرض النتائج هنا...</pre>
+    </div>
+
+    <script>
+        const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+
+        async function createUser( ) {
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultsDiv = document.getElementById('results');
+
+            try {
+                // هذا هو المسار الصحيح لإنشاء مستخدم
+                const response = await fetch(`${API_BASE_URL}/users/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ full_name: fullName, email: email, password: password })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || 'حدث خطأ');
+                resultsDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultsDiv.textContent = 'خطأ: ' + error.message;
+            }
+        }
+
+        async function createCase() {
+            const userId = document.getElementById('userId').value;
+            const title = document.getElementById('caseTitle').value;
+            const description = document.getElementById('caseDescription').value;
+            const resultsDiv = document.getElementById('results');
+
+            try {
+                // هذا هو المسار الصحيح لإنشاء قضية
+                const response = await fetch(`${API_BASE_URL}/cases/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: title, description: description, owner_id: userId })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || 'حدث خطأ');
+                resultsDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultsDiv.textContent = 'خطأ: ' + error.message;
+            }
+        }
+
+        async function getReport() {
+            const caseId = document.getElementById('caseIdForReport').value;
+            const resultsDiv = document.getElementById('results');
+
+            try {
+                // هذا هو المسار الصحيح لطلب تقرير
+                const response = await fetch(`${API_BASE_URL}/reports/${caseId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.detail || 'حدث خطأ');
+                resultsDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultsDiv.textContent = 'خطأ: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
